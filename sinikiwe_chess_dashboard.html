@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SinikiweJavas | Chess Training Dashboard</title>
+<style>
+:root{--bg:#10151d;--panel:#19222e;--panel2:#202c3a;--text:#eef4fa;--muted:#a8b6c7;--accent:#8fd3b8;--accent2:#f1c979;--red:#ff9d9d;--line:#304052}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(145deg,#10151d,#14202b);color:var(--text);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+header{padding:30px 18px 22px;border-bottom:1px solid var(--line);background:#111923}
+.wrap{max-width:1120px;margin:auto;padding:0 18px}
+.eyebrow{color:var(--accent);font-size:.78rem;text-transform:uppercase;letter-spacing:.15em;font-weight:700}
+h1{margin:.35rem 0;font-size:clamp(1.8rem,5vw,2.7rem);line-height:1.1}h2{font-size:1.2rem;margin:0 0 14px}h3{font-size:1rem;margin:0 0 8px}
+.sub{color:var(--muted);max-width:760px}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+button,.btn{border:0;border-radius:10px;padding:10px 14px;background:var(--accent);color:#102019;font-weight:750;cursor:pointer;text-decoration:none;display:inline-block}
+button.secondary,.btn.secondary{background:var(--panel2);color:var(--text);border:1px solid var(--line)}
+main{padding:22px 0 50px}.status{padding:12px 14px;border-radius:10px;background:var(--panel);color:var(--muted);margin-bottom:18px;border:1px solid var(--line)}
+.grid{display:grid;gap:14px}.stats{grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:16px}.two{grid-template-columns:repeat(2,minmax(0,1fr));margin-bottom:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:17px;min-width:0}.label{font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}.big{font-size:2rem;font-weight:800;margin:4px 0}.small{font-size:.88rem;color:var(--muted)}.pill{display:inline-block;border-radius:999px;padding:3px 9px;background:var(--panel2);font-size:.78rem;color:var(--muted)}
+.profile{display:flex;align-items:center;gap:14px}.avatar{width:64px;height:64px;border-radius:50%;object-fit:cover;background:var(--panel2);border:1px solid var(--line)}.profile-name{font-weight:800;font-size:1.2rem}.profile-meta{color:var(--muted);font-size:.88rem}
+table{border-collapse:collapse;width:100%;font-size:.9rem}th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}th{color:var(--muted);font-size:.78rem;text-transform:uppercase;letter-spacing:.04em}tr:last-child td{border-bottom:0}
+.table-wrap{overflow-x:auto}.win{color:var(--accent)}.loss{color:var(--red)}.draw{color:var(--accent2)}ul{padding-left:20px;margin:8px 0}li{margin:7px 0}.focus{border-left:3px solid var(--accent);padding-left:12px;margin:12px 0}.muted{color:var(--muted)}.empty{padding:14px;color:var(--muted)}
+footer{padding:18px 0;border-top:1px solid var(--line);color:var(--muted);font-size:.82rem}
+@media(max-width:760px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.two{grid-template-columns:1fr}.card{padding:14px}.big{font-size:1.7rem}}
+@media(max-width:390px){.stats{grid-template-columns:1fr 1fr}.big{font-size:1.45rem}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <div class="eyebrow">Personal chess improvement</div>
+  <h1>SinikiweJavas</h1>
+  <p class="sub">A simple dashboard for your public Chess.com profile, recent games, opening habits and practical training priorities. Your stated current rating is 619; live ratings below will be loaded from your public profile when available.</p>
+  <div class="actions">
+    <button id="refresh">Refresh public data</button>
+    <a class="btn secondary" href="https://www.chess.com/member/SinikiweJavas" target="_blank" rel="noreferrer">Open Chess.com profile</a>
+  </div>
+</div></header>
+<main class="wrap">
+  <div id="status" class="status" role="status">Ready to load public profile data.</div>
+  <section class="grid stats" id="ratingCards">
+    <div class="card"><div class="label">Rapid</div><div class="big">619*</div><div class="small">Your stated rating</div></div>
+    <div class="card"><div class="label">Blitz</div><div class="big">—</div><div class="small">Waiting for profile data</div></div>
+    <div class="card"><div class="label">Bullet</div><div class="big">—</div><div class="small">Waiting for profile data</div></div>
+    <div class="card"><div class="label">Daily</div><div class="big">—</div><div class="small">Waiting for profile data</div></div>
+  </section>
+  <section class="grid two">
+    <article class="card">
+      <h2>Profile</h2>
+      <div id="profile" class="profile"><div><div class="profile-name">SinikiweJavas</div><div class="profile-meta">Public Chess.com player profile</div></div></div>
+      <p id="profileDetails" class="small">The app will try to load account details and the latest available stats.</p>
+    </article>
+    <article class="card">
+      <h2>Overall recent results</h2>
+      <div class="grid stats" style="grid-template-columns:repeat(3,minmax(0,1fr));margin:0" id="resultCards">
+        <div><div class="label">Wins</div><div class="big win">—</div></div>
+        <div><div class="label">Draws</div><div class="big draw">—</div></div>
+        <div><div class="label">Losses</div><div class="big loss">—</div></div>
+      </div>
+      <p class="small">Based on the recent games this page can retrieve, not your full lifetime record.</p>
+    </article>
+  </section>
+  <section class="grid two">
+    <article class="card">
+      <h2>Your most-played openings</h2>
+      <p class="small">Grouped from opening names/ECO data in recent public games. Small samples can be misleading.</p>
+      <div id="openings" class="empty">Opening breakdown will appear after data loads.</div>
+    </article>
+    <article class="card">
+      <h2>Training priorities for a 619-rated player</h2>
+      <div class="focus"><strong>1. Checks, captures, threats</strong><br><span class="small">Before every move, check your opponent's forcing moves and whether a piece is hanging.</span></div>
+      <div class="focus"><strong>2. Keep your king safe</strong><br><span class="small">Develop, castle when appropriate, and do not chase attacks while your king is exposed.</span></div>
+      <div class="focus"><strong>3. Develop each piece with a plan</strong><br><span class="small">Avoid repeated opening moves with the same piece unless there is a clear reason.</span></div>
+      <div class="focus"><strong>4. Review one mistake per game</strong><br><span class="small">Find the first major turning point and write down what your opponent threatened.</span></div>
+    </article>
+  </section>
+  <section class="card" style="margin-bottom:16px">
+    <h2>Recent games</h2>
+    <p class="small">Latest games found in the newest available monthly archives. Select a game link to open it on Chess.com.</p>
+    <div class="table-wrap"><table><thead><tr><th>Date</th><th>Colour</th><th>Opponent</th><th>Result</th><th>Opening</th><th>Time</th></tr></thead><tbody id="games"><tr><td colspan="6" class="muted">Waiting for game data.</td></tr></tbody></table></div>
+  </section>
+  <section class="grid two">
+    <article class="card">
+      <h2>Opening guidance</h2>
+      <p class="small">A simple starting repertoire, which you can adjust after the app shows what you actually play:</p>
+      <ul>
+        <li><strong>As White:</strong> continue with 1.e4 if you enjoy open, tactical games. Learn the basic plans rather than memorising long lines.</li>
+        <li><strong>Against 1...e5:</strong> develop with Nf3 and Bc4 or choose another setup you enjoy, then castle.</li>
+        <li><strong>Against the Caro-Kann:</strong> try 1.e4 c6 2.d4 d5 3.e5 if you want a clear space-gaining plan.</li>
+        <li><strong>As Black vs 1.e4:</strong> start with 1...e5 while building tactical fundamentals.</li>
+        <li><strong>As Black vs 1.d4:</strong> a King's Indian-style setup with ...Nf6, ...g6, ...Bg7 and ...O-O is a longer-term option to learn.</li>
+      </ul>
+    </article>
+    <article class="card">
+      <h2>How to use this dashboard</h2>
+      <ul>
+        <li>Press <strong>Refresh public data</strong> to reload your profile and recent games.</li>
+        <li>Use the opening table to identify the positions you play most often and compare results cautiously.</li>
+        <li>Review each loss on Chess.com or with an analysis board. This dashboard does not run a chess engine, so it does not claim engine accuracy or identify best moves.</li>
+        <li>If Chess.com limits requests or the browser blocks access, try refreshing later. Public API data may be cached by Chess.com.</li>
+      </ul>
+    </article>
+  </section>
+  <footer>Independent personal project using public Chess.com data. Not affiliated with or endorsed by Chess.com. Public API availability and cached data may affect results.</footer>
+</main>
+<script>
+const USER = "SinikiweJavas";
+const API = "https://api.chess.com/pub/player/" + encodeURIComponent(USER);
+const $ = id => document.getElementById(id);
+const safe = v => String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const dateFmt = ts => ts ? new Date(ts * 1000).toLocaleDateString(undefined,{year:"numeric",month:"short",day:"numeric"}) : "—";
+const timeName = s => ({chess_rapid:"Rapid",chess_blitz:"Blitz",chess_bullet:"Bullet",chess_daily:"Daily",chess960:"Chess960"}[s] || s.replace(/^chess_/,"").replace(/^\w/,x=>x.toUpperCase()));
+function setStatus(message, bad=false){$("status").textContent=message;$("status").style.color=bad?"#ff9d9d":"#a8b6c7";}
+async function getJson(url){const r=await fetch(url,{headers:{"Accept":"application/json"}});if(!r.ok)throw new Error("Request failed ("+r.status+") for "+url);return r.json();}
+function statRecord(s){return s?.record || {win:0,loss:0,draw:0};}
+function renderRatings(stats){
+ const modes=["chess_rapid","chess_blitz","chess_bullet","chess_daily"];
+ $("ratingCards").innerHTML=modes.map(mode=>{
+  const s=stats[mode], rating=s?.last?.rating, best=s?.best?.rating, rec=statRecord(s);
+  return `<div class="card"><div class="label">${timeName(mode)}</div><div class="big">${rating ?? "—"}</div><div class="small">${s ? `W ${rec.win||0} · D ${rec.draw||0} · L ${rec.loss||0}` : "No public rating data"}</div>${best?`<div class="small">Best: ${best}</div>`:""}</div>`;
+ }).join("");
+}
+function parseHeader(pgn,key){const line=(pgn||"").split(/\r?\n/).find(x=>x.startsWith("["+key+" "));return line?((line.match(/^\[[^\s]+\s+"([^"]*)"\]/)||[])[1]||""):"";}
+function gameOpening(g){return parseHeader(g.pgn,"Opening") || g.eco?.split("/").pop() || "Opening not provided";}
+function gameEco(g){return parseHeader(g.pgn,"ECO") || "";}
+function playerSide(g){return (g.white?.username||"").toLowerCase()===USER.toLowerCase()?"white":"black";}
+function resultFor(g){const side=playerSide(g), p=side==="white"?g.white:g.black;const r=p?.result;
+ if(r==="win")return "Win"; if(["agreed","repetition","stalemate","insufficient","50move","timevsinsufficient"].includes(r))return "Draw";
+ if(r==="checkmated"||r==="resigned"||r==="timeout"||r==="lose")return "Loss";
+ if(r==="abandoned")return "Abandoned";
+ if(g.white?.result==="win"&&g.black?.result==="win")return "Unknown";
+ return r||"Unknown";}
+function resultClass(r){return r==="Win"?"win":r==="Loss"?"loss":r==="Draw"?"draw":"";}
+function timeLabel(g){if(g.time_class)return g.time_class[0].toUpperCase()+g.time_class.slice(1);return g.time_control||"—";}
+function renderResults(games){
+ let wins=0,draws=0,losses=0;
+ games.forEach(g=>{const r=resultFor(g);if(r==="Win")wins++;else if(r==="Draw")draws++;else if(r==="Loss")losses++;});
+ const total=wins+draws+losses;
+ $("resultCards").innerHTML=[["Wins",wins,"win"],["Draws",draws,"draw"],["Losses",losses,"loss"]].map(([n,v,c])=>`<div><div class="label">${n}</div><div class="big ${c}">${v}</div></div>`).join("");
+ return {wins,draws,losses,total};
+}
+function renderOpenings(games){
+ const map=new Map();
+ for(const g of games){const name=gameOpening(g);const key=(playerSide(g)==="white"?"White: ":"Black: ")+name;const item=map.get(key)||{name,side:playerSide(g),games:0,wins:0,draws:0,losses:0};
+  item.games++;const r=resultFor(g);if(r==="Win")item.wins++;if(r==="Draw")item.draws++;if(r==="Loss")item.losses++;map.set(key,item);}
+ const arr=[...map.values()].sort((a,b)=>b.games-a.games).slice(0,10);
+ if(!arr.length){$("openings").innerHTML="No opening names were available in the retrieved games.";return;}
+ $("openings").innerHTML=`<div class="table-wrap"><table><thead><tr><th>Opening / colour</th><th>Games</th><th>W-D-L</th><th>Win %</th></tr></thead><tbody>${arr.map(o=>`<tr><td>${safe(o.name)}<br><span class="pill">${o.side==="white"?"As White":"As Black"}</span></td><td>${o.games}</td><td>${o.wins}-${o.draws}-${o.losses}</td><td>${o.games?Math.round(o.wins/o.games*100):0}%</td></tr>`).join("")}</tbody></table></div>`;
+}
+function renderGames(games){
+ const rows=games.slice(0,30).map(g=>{
+  const side=playerSide(g), opponent=side==="white"?g.black:g.white, r=resultFor(g), opening=gameOpening(g);
+  return `<tr><td>${dateFmt(g.end_time)}</td><td>${side==="white"?"White":"Black"}</td><td>${safe(opponent?.username||"Unknown")}<br><span class="small">Rating ${opponent?.rating??"—"}</span></td><td class="${resultClass(r)}">${safe(r)}</td><td>${safe(opening)}${gameEco(g)?`<br><span class="small">${safe(gameEco(g))}</span>`:""}</td><td>${safe(timeLabel(g))}<br><a href="${safe(g.url||"#")}" target="_blank" rel="noreferrer">View game</a></td></tr>`;
+ }).join("");
+ $("games").innerHTML=rows||'<tr><td colspan="6" class="muted">No games were found in the recent archives.</td></tr>';
+}
+async function load(){
+ $("refresh").disabled=true;$("refresh").textContent="Loading…";
+ setStatus("Loading public Chess.com profile and stats…");
+ try{
+  const profile=await getJson(API);
+  let stats={};try{stats=await getJson(API+"/stats");}catch(e){console.warn(e);}
+  renderRatings(stats);
+  const avatar=profile.avatar?`<img class="avatar" src="${safe(profile.avatar)}" alt="Public profile avatar">`:`<div class="avatar"></div>`;
+  $("profile").innerHTML=`${avatar}<div><div class="profile-name">${safe(profile.username||USER)} ${profile.title?`<span class="pill">${safe(profile.title)}</span>`:""}</div><div class="profile-meta">${safe(profile.name||"Chess.com player")}</div><div class="profile-meta">${profile.followers??"—"} followers · Joined ${dateFmt(profile.joined)}</div></div>`;
+  $("profileDetails").innerHTML=`<a href="${safe(profile.url||"https://www.chess.com/member/"+USER)}" target="_blank" rel="noreferrer">Public profile</a>${profile.location?" · "+safe(profile.location):""}${profile.last_online?" · Last online "+dateFmt(profile.last_online):""}`;
+  setStatus("Profile loaded. Looking for recent game archives…");
+  const archiveData=await getJson(API+"/games/archives");
+  const urls=(archiveData.archives||[]).slice(-4).reverse();
+  let games=[];
+  for(const url of urls){
+   try{const data=await getJson(url);games=games.concat(data.games||[]);}catch(e){console.warn("Archive unavailable",url,e);}
+  }
+  games.sort((a,b)=>(b.end_time||0)-(a.end_time||0));
+  games=games.slice(0,100);
+  renderResults(games);renderOpenings(games);renderGames(games);
+  setStatus(`Loaded public profile and ${games.length} recent games from the latest available archives. Opening statistics reflect this sample only.`);
+ }catch(err){
+  console.error(err);
+  setStatus("Could not load Chess.com data in this browser. The public API may be temporarily unavailable, or your connection may block the request. Try Refresh again later. Details: "+err.message,true);
+ }finally{$("refresh").disabled=false;$("refresh").textContent="Refresh public data";}
+}
+$("refresh").addEventListener("click",load);
+load();
+</script>
+</body>
+</html>
